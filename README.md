@@ -48,5 +48,99 @@ ansible_ssh_private_key_file=~/ansible/sshkey.pem
 [local]
 127.0.0.1
 ```
+or
+
+```
+[dev]
+3.91.60.111 ansible_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/ansible/ansible.pem
+```
+
+
 
 dev:vars parameters are applied to the servers under dev label. As we know that Ansible uses ssh for connecting to hosts. So we need to specify the username and password of those hosts. If all the servers have the same username and password, you can mention it in dev:vars label
+
+
+Once added verify the connectivity using below command:
+
+`ansible dev -m ping -i hosts`
+
+If you have Multiple group in the host file and need to check all host group connectivity:
+
+`ansible all -m ping -i hosts`
+
+The out put look likes:
+
+```
+3.91.60.111 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+
+```
+
+# Playbooks
+
+## Ansible playbook for install nginx on remote host 
+
+```
+- hosts: dev
+  become: yes
+  tasks:
+  - name: "apt-get update"
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+
+  - name: "install nginx"
+    apt:
+      name: ['nginx']
+      state: latest
+```
+
+## To run the playbook with host file:
+
+`ansible-playbook -i hosts nginx_install.yml`
+
+## To copy content into remote host:
+### playbook 
+```
+- hosts: dev
+  become: yes
+  tasks:
+  - name: copy web content
+    template:
+      src: index.html
+      dest: /var/www/html/
+      owner: root
+      group: root
+      mode: '0644'
+    notify: restart nginx
+
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+```
+`ansible-playbook -i hosts copy.yml`
+
+## To sync multiple files from source to destination:
+### playbook 
+```
+- hosts: dev
+  tasks:
+  - name: "sync website"
+    synchronize:
+      src: site/
+      dest: /var/www/html
+      archive: no
+      checksum: yes
+      recursive: yes
+      delete: yes
+    become: yes
+```
+
+`ansible-playbook -i hosts sync.yml`
