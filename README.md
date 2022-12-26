@@ -1,146 +1,35 @@
-# Ansible
-## Installing Ansible on Ubuntu
+# What is Ansible?
+ 
+  Ansible is a radically simple IT automation platform that makes your applications and systems easier to deploy. Avoid writing scripts or custom code to deploy and update your applications— automate in a language that approaches plain English, using SSH, with no agents to install on remote systems. For anyone in the IT automation or DevOps engineer fields, learning the basics of Ansible is important.
 
- `sudo apt install python3`
+## What Are the Benefits to Learning Ansible Basics?
 
- `sudo apt install python3-pip`
+  - A free and open-source community project with a huge audience.
+  - Battle-tested over many years as the preferred tool of IT wizards.
+  - Easy to start and use from day one, without the need for any special coding skills.
+  - Simple deployment workflow without any extra agents.
+  - Includes some sophisticated features around modularity and reusability that come in handy as users become more proficient.
+  - Extensive and comprehensive official documentation that is complemented by a plethora of online material produced by its community.
+  
+# Ansible Basics
 
- `pip3 install boto boto3 ansible`
+### Ansible Inventory:
+  A list of managed nodes provided by one or more ‘inventory sources’. Your inventory can specify information specific to each node, like IP address. It is also used for assigning groups, that both allow for node selection in the Play and bulk variable assignment.
 
- `sudo apt-get install ansible`
+### Ansible Playbooks:
+  A playbook is composed of one or more ‘plays’ in an ordered list. The terms ‘playbook’ and ‘play’ are sports analogies. Each play executes part of the overall goal of the playbook, running one or more tasks. Each task calls an Ansible module. Playbooks are expressed in YAML format with a minimum of syntax.
 
-To verify the ansible version 
+### Ansible Modules :
+  The code or binaries that Ansible copies and executes on each managed node (when needed) to accomplish the action defined in each Task. Each module has a particular use, from administering users on a specific type of database to managing VLAN interfaces on a specific type of network device. You can invoke a single module with a task, or invoke several different modules in a playbook. Ansible modules are grouped in collections 
+   
+### Ansible Variables:
+  Ansible uses variables to manage differences between systems. With Ansible, you can execute tasks and playbooks on multiple different systems with a single command. To represent the variations among those different systems, you can create variables with standard YAML syntax, including lists and dictionaries. You can define these variables in your playbooks, in your inventory, in re-usable files or roles, or at the command line. You can also create variables during a playbook run by registering the return value or values of a task as a new variable.
+  
+ ### Ansible Conditionals:
+  In a playbook, you may want to execute different tasks, or have different goals, depending on the value of a fact (data about the remote system), a variable, or the result of a previous task. You may want the value of some variables to depend on the value of other variables. Or you may want to create additional groups of hosts based on whether the hosts match other criteria. You can do all of these things with conditionals. 
 
- `ansible --version`
-
-![image](https://user-images.githubusercontent.com/42967535/118642599-30e53700-b7f9-11eb-9bad-48763ca34b98.png)
-
-# Configuring hosts
-
-Here I represent all the servers that have to be managed using Ansible as hosts. Ansible keeps track of the hosts using the inventory file ( A file with list of servers). It has the IP address/domain name of the hosts with username, password or key information to connect to the node.
-
-All the default configurations are present in /etc/ansible/ansible.cfg file. Here you can change all the default paths if you want your own custom paths and configurations.
-
-Now let’s disable host key checking by replacing the host_key_checking parameter to true so that Ansible won’t prompt for host key checking. 
-
-`sed -i '/#host_key_checking = False/c\host_key_checking = True' /etc/ansible/ansible.cfg`
-
-By default the inventory file named hosts is present in /etc/ansible/ directory. If you open the /etc/ansible/hosts you will find the sample host entries. Lets keeps this file as a backup and create our own hosts file.
-
-Let’s create the backup of original hosts inventory file.
-
-`sudo mv /etc/ansible/hosts /etc/ansible/hosts.original`
-
-Create a new hosts file.
-
-`sudo touch /etc/ansible/hosts`
-
-```
-[dev]
-192.168.2.30
-192.168.2.40
-
-[dev:vars]
-ansible_user=ubuntu
-ansible_ssh_pass=password
-ansible_ssh_private_key_file=~/ansible/sshkey.pem
-
-[local]
-127.0.0.1
-```
-or
-
-```
-[dev]
-3.91.60.111 ansible_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/ansible/ansible.pem
-```
-
-
-
-dev:vars parameters are applied to the servers under dev label. As we know that Ansible uses ssh for connecting to hosts. So we need to specify the username and password of those hosts. If all the servers have the same username and password, you can mention it in dev:vars label
-
-
-Once added verify the connectivity using below command:
-
-`ansible dev -m ping -i hosts`
-
-If you have Multiple group in the host file and need to check all host group connectivity:
-
-`ansible all -m ping -i hosts`
-
-The out put look likes:
-
-```
-3.91.60.111 | SUCCESS => {
-    "ansible_facts": {
-        "discovered_interpreter_python": "/usr/bin/python3"
-    },
-    "changed": false,
-    "ping": "pong"
-}
-
-```
-
-# Playbooks
-
-## Ansible playbook for install nginx on remote host 
-
-```
-- hosts: dev
-  become: yes
-  tasks:
-  - name: "apt-get update"
-    apt:
-      update_cache: yes
-      cache_valid_time: 3600
-
-  - name: "install nginx"
-    apt:
-      name: ['nginx']
-      state: latest
-```
-
-## To run the playbook with host file:
-
-`ansible-playbook -i hosts nginx_install.yml`
-
-## To copy content into remote host:
-### playbook 
-```
-- hosts: dev
-  become: yes
-  tasks:
-  - name: copy web content
-    template:
-      src: index.html
-      dest: /var/www/html/
-      owner: root
-      group: root
-      mode: '0644'
-    notify: restart nginx
-
-  handlers:
-    - name: restart nginx
-      service:
-        name: nginx
-        state: restarted
-```
-`ansible-playbook -i hosts copy.yml`
-
-## To sync multiple files from source to destination:
-### playbook 
-```
-- hosts: dev
-  tasks:
-  - name: "sync website"
-    synchronize:
-      src: site/
-      dest: /var/www/html
-      archive: no
-      checksum: yes
-      recursive: yes
-      delete: yes
-    become: yes
-```
-
-`ansible-playbook -i hosts sync.yml`
+### Ansible Loops :
+  Ansible offers the loop, with_, and until keywords to execute a task multiple times.
+ 
+### Ansible Roles:
+  A limited distribution of reusable Ansible content (tasks, handlers, variables, plugins, templates and files) for use inside of a Play. To use any Role resource, the Role itself must be imported into the Play.
