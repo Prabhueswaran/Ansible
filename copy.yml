@@ -1,0 +1,16 @@
+- hosts: dev
+  become: yes
+  tasks:
+  - name: copy web content
+    template:
+      src: index.html
+      dest: /var/www/html/
+      owner: root
+      group: root
+      mode: '0644'
+    notify: restart nginx
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
