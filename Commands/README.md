@@ -1,0 +1,1 @@
+ansible dev -m ping -i inventory
