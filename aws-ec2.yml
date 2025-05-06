@@ -12,7 +12,7 @@
     region: ap-south-1
   tasks:
     - name: Launch instance
-      ec2:
+      amazon.aws.ec2_instance:
          aws_access_key: "{{ec2_access_key}}"
          aws_secret_key: "{{ec2_secret_key}}"
          key_name: "{{ keypair }}"
