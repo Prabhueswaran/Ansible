@@ -1,26 +1,35 @@
 ---
-- name: Create a sandbox instance
+- name: Launch EC2 instance in AWS
   hosts: localhost
-  gather_facts: False
+  connection: local
+  gather_facts: no
+
   vars:
-    ec2_access_key: access_key
-    ec2_secret_key: secret_key
-    keypair: devops
+    region: us-east-1
+    ami_id: ami-0c55b159cbfafe1f0  # Replace with a valid AMI ID in your region
     instance_type: t2.micro
-    security_group: devops-sg
-    image: ami-0e9182bc6494264a4
-    region: ap-south-1
+    key_name: my-key               # Replace with your key pair name
+    security_group: my-sg-id       # Security Group ID (e.g., sg-xxxxxxxx)
+    subnet_id: subnet-xxxxxxxx     # Subnet ID to launch the instance in
+    instance_name: my-ec2-instance
+
   tasks:
-    - name: Launch instance
+    - name: Launch EC2 instance
       amazon.aws.ec2_instance:
-         aws_access_key: "{{ec2_access_key}}"
-         aws_secret_key: "{{ec2_secret_key}}"
-         key_name: "{{ keypair }}"
-         group: "{{ security_group }}"
-         instance_type: "{{ instance_type }}"
-         image: "{{ image }}"
-         wait: true
-         region: "{{ region }}"
-         vpc_subnet_id: subnet-055a768cbd9615a2f
-         assign_public_ip: yes
+        name: "{{ instance_name }}"
+        key_name: "{{ key_name }}"
+        instance_type: "{{ instance_type }}"
+        image_id: "{{ ami_id }}"
+        region: "{{ region }}"
+        vpc_subnet_id: "{{ subnet_id }}"
+        security_group: "{{ security_group }}"
+        wait: yes
+        count: 1
+        tags:
+          Environment: Test
+          Name: "{{ instance_name }}"
       register: ec2
+
+    - name: Output instance public IP
+      debug:
+        msg: "EC2 instance public IP is {{ ec2.instances[0].public_ip_address }}"
