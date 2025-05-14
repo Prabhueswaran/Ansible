@@ -1,0 +1,9 @@
+wp_db_name: wordpress
+wp_db_user: wp_user
+wp_db_password: wp_pass
+wp_db_host: localhost
+wp_site_url: http://13.233.96.236
+mysql_root_password: rootpass123
+wordpress_download_url: https://wordpress.org/latest.tar.gz
+wordpress_install_dir: /var/www/html
+

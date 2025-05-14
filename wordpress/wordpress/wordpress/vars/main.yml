@@ -1,0 +1,19 @@
+#SPDX-License-Identifier: MIT-0
+# vars file for wordpress
+---
+apache_packages:
+  - apache2
+  - libapache2-mod-php
+  - php
+  - php-mysql
+  - php-curl
+  - php-gd
+  - php-mbstring
+  - php-xml
+  - php-xmlrpc
+  - php-soap
+  - php-intl
+  - php-zip
+  - mysql-server
+wordpress_download_url: https://wordpress.org/latest.tar.gz
+wordpress_install_dir: /var/www/html
